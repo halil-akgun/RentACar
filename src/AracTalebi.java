@@ -20,6 +20,7 @@ public class AracTalebi {
         this.teslimSaati = teslimSaati;
     }
 
+
     public String getAlinacakSehir() {
         return alinacakSehir;
     }

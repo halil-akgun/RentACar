@@ -1,3 +1,6 @@
+import javax.swing.text.DateFormatter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -7,15 +10,10 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MusteriVeAracBilgileriServis {
-/*
- 	aracTalep() adında bir method oluşturunuz. Bu method’da alinacak sehir, teslim edilecek sehir,
-    alinacak gun ve teslim edilecek gun ve teslim saati bilgilerini aliniz. Odenecek toplam gun sayisini yazdırın.
-    Dikkat: Teslim gunu, alis gününden daha once olamaz.
- */
 
-    public AracTalebi aracTalep() {
+    static List<Arac> aracList = new ArrayList<>();
 
-
+    public static AracTalebi aracTalep() {
         Scanner inp = new Scanner(System.in);
         System.out.println("Araci hangi sehirden teslim almak istediginizi belirtiniz:");
         String cityTakeOn = inp.nextLine();
@@ -45,43 +43,11 @@ public class MusteriVeAracBilgileriServis {
             } else if (numberOfDaysToPay == 0) {
                 System.out.println("Ayni gun icerisinde alinip teslim edilen araclar icin bir gunluk ucret alinir!");
             }
-            //boolean isBefore = dateOfTake.isBefore(dateOfDelivery);
         } while (isValid);
         return new AracTalebi(cityTakeOn, dateOfTake, dateOfDelivery, timeOfDelivery);
     }
 
-    public static void main(String[] args) {
-        createVehicle();
-        showList();
-
-
-    }
-    /*
-    -	arabalar() create ederek, tüm araç modellerini bir list’e atınız.
-            (parametre olarak araç ile ilgili bilgileri alan <marka, model, yakıt tipi, vites, gunlukUcret> objeleri list’e atınız.)
-    Bu list’i göstererek bir aracı kiralamasını sağlayın.
-
-     */
-
-
-    //    public void arabalar(){
-//        //String marka, String model, String yakitTipi, String vites, double gunlukUcret
-//        Scanner inp = new Scanner(System.in);
-//        System.out.println("Aracin markasini giriniz");
-//        String make = inp.nextLine();
-//        System.out.println("Aracin modelini giriniz");
-//        String model = inp.nextLine();
-//        System.out.println("Aracin yakit tipini giriniz");
-//        String fuelType = inp.nextLine();
-//        System.out.println("Aracin vites tipini giriniz giriniz");
-//        String gearType = inp.nextLine();
-//        System.out.println("Aracin gunluk ucretini belirtiniz");
-//        double dayPrice = inp.nextDouble();
-//    }Marka Model Yakit Tipi VitesTipi Gunluk Ucret
-    static List<Arac> aracList = new ArrayList<>();
-
     public static void createVehicle() {
-
         Arac arac1 = new Arac("Honda", "Civic", "Dizel", "Otomatik", 700.0);
         Arac arac2 = new Arac("Honda", "Accord", "Benzinli", "Manuel", 600.0);
         Arac arac3 = new Arac("Toyota", "Corolla", "Dizel", "Otomatik", 900.0);
@@ -95,15 +61,85 @@ public class MusteriVeAracBilgileriServis {
         aracList.add(arac5);
     }
 
-    public static void showList() {
-        System.out.println("*******************************ARAC LISTEMIZ***********************************************");
+    public static void getAraba() {
+        System.out.println();
+        System.out.println("**********  ONLINE ARAÇ KİRALAMA SİTEMİZE HOŞGELDİNİZ  **********");
+        System.out.println();
+        System.out.println("************************* ARAC LISTEMIZ *************************");
         System.out.printf("%-12s   %-9s   %-10s   %-10s   %-12s\n", "Marka", "Model", "Yakit Tipi", "Vites Tipi", "Gunluk Ucret");
+        System.out.printf("%-12s   %-9s   %-10s   %-10s   %-12s\n", "_____", "_____", "__________", "__________", "____________");
         for (Arac w : aracList) {
 
             System.out.printf("%-12s   %-9s   %-10s   %-10s   %-12s\n",
                     w.getMarka(), w.getModel(), w.getYakitTipi(), w.getVites(), w.getGunlukUcret());
         }
 
+        Scanner inp = new Scanner(System.in);
+        double fiyat = 0;
+        boolean isExist = false;
+        do {
+            System.out.println("Aracin markasini giriniz");
+            String make = inp.nextLine();
+            System.out.println("Aracin modelini giriniz");
+            String model = inp.nextLine();
 
+            for (Arac arac : aracList) {
+                if (arac.getMarka().equals(make) && arac.getModel().equals(model)) {
+                    System.out.printf("%-12s   %-9s   %-10s   %-10s   %-12s\n", "Marka", "Model", "Yakit Tipi", "Vites Tipi", "Gunluk Ucret");
+                    System.out.printf("%-12s   %-9s   %-10s   %-10s   %-12s\n", "_____", "_____", "__________", "__________", "____________");
+                    System.out.printf("%-12s   %-9s   %-10s   %-10s   %-12s\n", arac.getMarka(), arac.getModel(),
+                            arac.getYakitTipi(), arac.getVites(), arac.getGunlukUcret());
+                    fiyat = arac.getGunlukUcret();
+                    isExist = true;
+                }
+            }
+            if (!isExist) System.out.println("Flomuzda böyle bir araç mevcut değildir.");
+        } while (!isExist);
+
+        AracTalebi aracTalebi = aracTalep();
+        long numberOfDaysToPay = ChronoUnit.DAYS.between(aracTalebi.getAlinacakGun(), aracTalebi.getTeslimGunu());
+        System.out.println(numberOfDaysToPay + " gün için toplam ödenecek ücret: " + (numberOfDaysToPay * fiyat));
+        System.out.println("onay için 1, yeni seçim için 2, çıkış için herhangi bir tuşa basın.");
+        String secim = inp.next();
+        if (secim.equals("1")) {
+            musteriBilgileri();
+        } else if (secim.equals("2")) {
+            getAraba();
+        } else System.out.println("İyi günler.");
+
+
+    }
+
+    public static void musteriBilgileri() {
+        Scanner inp = new Scanner(System.in);
+        System.out.println("Adınız Soyadınız:");
+        String adSoyad = inp.nextLine();
+        System.out.println("TC no:");
+        String tcNo = inp.next();
+        System.out.println("Yaşınız:");
+        String yas = inp.next();
+        inp.nextLine();
+        System.out.println("Telefon Numaranız:");
+        String tel = inp.nextLine();
+        System.out.println("Ad-Soyad: " + adSoyad + "\nTC no: " + tcNo + "\nYaş: " + yas + "\nTelefon: " + tel);
+        OdemeBilgieri();
+    }
+
+    public static void OdemeBilgieri() {
+        Scanner inp = new Scanner(System.in);
+        System.out.println("Kart Sahibinin Adı-Soyadı");
+        String adSoyad = inp.nextLine();
+        do {
+            System.out.println("Kart Numarası:");
+            String kartNo = inp.nextLine();
+            if (kartNo.replaceAll(" ", "").length() == 12) break;
+            else System.out.println("Kart numarası hatalı.");
+        } while (true);
+        System.out.println("Son kullanma tarihi: (08/24 şeklinde giriniz)");
+        String sonKullanmaTarihi = inp.next();
+        System.out.println("Güvenlik Kodu:");
+        String guvenlikKodu = inp.next();
+
+        System.out.println("Ödemeniz başarıyla gerçekleşti. İyi günler dileriz.");
     }
 }
